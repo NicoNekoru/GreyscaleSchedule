@@ -1,0 +1,322 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B00000000000000000000001 /* SharedConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000001 /* SharedConfiguration.swift */; };
+		B00000000000000000000002 /* ControlIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000002 /* ControlIdentity.swift */; };
+		B00000000000000000000003 /* DisplayFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000003 /* DisplayFilter.swift */; };
+		B00000000000000000000004 /* ProcessRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000004 /* ProcessRunner.swift */; };
+		B00000000000000000000005 /* Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000005 /* Schedule.swift */; };
+		B00000000000000000000006 /* ControlCenterIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000006 /* ControlCenterIntegration.swift */; };
+		B00000000000000000000007 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000007 /* AppDelegate.swift */; };
+		B00000000000000000000008 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000008 /* main.swift */; };
+		B00000000000000000000009 /* SharedConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000001 /* SharedConfiguration.swift */; };
+		B0000000000000000000000A /* ControlExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000009 /* ControlExtension.swift */; };
+		B0000000000000000000000B /* GreyscaleControl.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = F0000000000000000000000B /* GreyscaleControl.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B0000000000000000000000C /* GreyscaleControlIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000010 /* GreyscaleControlIntent.swift */; };
+		B0000000000000000000000D /* GreyscaleControlIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000010 /* GreyscaleControlIntent.swift */; };
+		B0000000000000000000000E /* DisplayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000013 /* DisplayState.swift */; };
+		B0000000000000000000000F /* ControlRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000011 /* ControlRequest.swift */; };
+		B00000000000000000000010 /* ControlRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000011 /* ControlRequest.swift */; };
+		B00000000000000000000011 /* ControlRequestAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000012 /* ControlRequestAgent.swift */; };
+		B00000000000000000000012 /* DisplayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000013 /* DisplayState.swift */; };
+		B00000000000000000000013 /* ControlService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000014 /* ControlService.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C00000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A00000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A00000000000000000000003;
+			remoteInfo = GreyscaleControl;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D00000000000000000000001 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				B0000000000000000000000B /* GreyscaleControl.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		F00000000000000000000001 /* SharedConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = app/SharedConfiguration.swift; sourceTree = "<group>"; };
+		F00000000000000000000002 /* ControlIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = app/ControlIdentity.swift; sourceTree = "<group>"; };
+		F00000000000000000000003 /* DisplayFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = app/DisplayFilter.swift; sourceTree = "<group>"; };
+		F00000000000000000000004 /* ProcessRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = app/ProcessRunner.swift; sourceTree = "<group>"; };
+		F00000000000000000000005 /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = app/Schedule.swift; sourceTree = "<group>"; };
+		F00000000000000000000006 /* ControlCenterIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = app/ControlCenterIntegration.swift; sourceTree = "<group>"; };
+		F00000000000000000000007 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = app/AppDelegate.swift; sourceTree = "<group>"; };
+		F00000000000000000000008 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = app/main.swift; sourceTree = "<group>"; };
+		F00000000000000000000009 /* ControlExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = app/ControlExtension.swift; sourceTree = "<group>"; };
+		F0000000000000000000000A /* Greyscale Schedule.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Greyscale Schedule.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F0000000000000000000000B /* GreyscaleControl.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = GreyscaleControl.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F0000000000000000000000C /* App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = app/App-Info.plist; sourceTree = "<group>"; };
+		F0000000000000000000000D /* ControlExtension-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = app/ControlExtension-Info.plist; sourceTree = "<group>"; };
+		F0000000000000000000000E /* extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = extension.entitlements; sourceTree = "<group>"; };
+		F0000000000000000000000F /* README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = app/README.txt; sourceTree = "<group>"; };
+		F00000000000000000000010 /* GreyscaleControlIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = app/GreyscaleControlIntent.swift; sourceTree = "<group>"; };
+		F00000000000000000000011 /* ControlRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = app/ControlRequest.swift; sourceTree = "<group>"; };
+		F00000000000000000000012 /* ControlRequestAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = app/ControlRequestAgent.swift; sourceTree = "<group>"; };
+		F00000000000000000000013 /* DisplayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = app/DisplayState.swift; sourceTree = "<group>"; };
+		F00000000000000000000014 /* ControlService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = app/ControlService.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E00000000000000000000001 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		E00000000000000000000002 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A00000000000000000000005 = {
+			isa = PBXGroup;
+			children = (
+				F00000000000000000000001 /* SharedConfiguration.swift */,
+				F00000000000000000000002 /* ControlIdentity.swift */,
+				F00000000000000000000003 /* DisplayFilter.swift */,
+				F00000000000000000000004 /* ProcessRunner.swift */,
+				F00000000000000000000005 /* Schedule.swift */,
+				F00000000000000000000006 /* ControlCenterIntegration.swift */,
+				F00000000000000000000007 /* AppDelegate.swift */,
+				F00000000000000000000008 /* main.swift */,
+				F00000000000000000000009 /* ControlExtension.swift */,
+				F00000000000000000000010 /* GreyscaleControlIntent.swift */,
+				F00000000000000000000011 /* ControlRequest.swift */,
+				F00000000000000000000012 /* ControlRequestAgent.swift */,
+				F00000000000000000000013 /* DisplayState.swift */,
+				F00000000000000000000014 /* ControlService.swift */,
+				F0000000000000000000000C /* App-Info.plist */,
+				F0000000000000000000000D /* ControlExtension-Info.plist */,
+				F0000000000000000000000E /* extension.entitlements */,
+				F0000000000000000000000F /* README.txt */,
+				A00000000000000000000004 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A00000000000000000000004 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F0000000000000000000000A /* Greyscale Schedule.app */,
+				F0000000000000000000000B /* GreyscaleControl.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A00000000000000000000002 /* Greyscale Schedule */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A000000000000000000000010 /* Build configuration list for PBXNativeTarget "Greyscale Schedule" */;
+			buildPhases = (
+				E00000000000000000000003 /* Sources */,
+				E00000000000000000000001 /* Frameworks */,
+				E00000000000000000000005 /* Resources */,
+				D00000000000000000000001 /* Embed App Extensions */,
+			);
+			buildRules = ();
+			dependencies = (
+				D00000000000000000000002 /* PBXTargetDependency */,
+			);
+			name = "Greyscale Schedule";
+			productName = "Greyscale Schedule";
+			productReference = F0000000000000000000000A /* Greyscale Schedule.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A00000000000000000000003 /* GreyscaleControl */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A000000000000000000000011 /* Build configuration list for PBXNativeTarget "GreyscaleControl" */;
+			buildPhases = (
+				E00000000000000000000004 /* Sources */,
+				E00000000000000000000002 /* Frameworks */,
+				E00000000000000000000006 /* Resources */,
+			);
+			buildRules = ();
+			dependencies = ();
+			name = GreyscaleControl;
+			productName = GreyscaleControl;
+			productReference = F0000000000000000000000B /* GreyscaleControl.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A00000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2660;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {
+					A00000000000000000000002 = { CreatedOnToolsVersion = 26.6; };
+					A00000000000000000000003 = { CreatedOnToolsVersion = 26.6; };
+				};
+			};
+			buildConfigurationList = A000000000000000000000012 /* Build configuration list for PBXProject "GreyscaleSchedule" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (en, Base, );
+			mainGroup = A00000000000000000000005;
+			productRefGroup = A00000000000000000000004 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A00000000000000000000002 /* Greyscale Schedule */,
+				A00000000000000000000003 /* GreyscaleControl */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E00000000000000000000005 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		E00000000000000000000006 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E00000000000000000000003 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B00000000000000000000001 /* SharedConfiguration.swift in Sources */,
+				B00000000000000000000002 /* ControlIdentity.swift in Sources */,
+				B00000000000000000000003 /* DisplayFilter.swift in Sources */,
+				B00000000000000000000004 /* ProcessRunner.swift in Sources */,
+				B00000000000000000000005 /* Schedule.swift in Sources */,
+				B00000000000000000000006 /* ControlCenterIntegration.swift in Sources */,
+				B00000000000000000000007 /* AppDelegate.swift in Sources */,
+				B00000000000000000000008 /* main.swift in Sources */,
+				B0000000000000000000000C /* GreyscaleControlIntent.swift in Sources */,
+				B0000000000000000000000F /* ControlRequest.swift in Sources */,
+				B00000000000000000000011 /* ControlRequestAgent.swift in Sources */,
+				B00000000000000000000012 /* DisplayState.swift in Sources */,
+				B00000000000000000000013 /* ControlService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E00000000000000000000004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B00000000000000000000009 /* SharedConfiguration.swift in Sources */,
+				B0000000000000000000000E /* DisplayState.swift in Sources */,
+				B0000000000000000000000D /* GreyscaleControlIntent.swift in Sources */,
+				B00000000000000000000010 /* ControlRequest.swift in Sources */,
+				B0000000000000000000000A /* ControlExtension.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D00000000000000000000002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A00000000000000000000003 /* GreyscaleControl */;
+			targetProxy = C00000000000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A000000000000000000000020 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; MACOSX_DEPLOYMENT_TARGET = 26.0; SDKROOT = macosx; SWIFT_VERSION = 5.0; }; name = Debug; };
+		A000000000000000000000021 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; MACOSX_DEPLOYMENT_TARGET = 26.0; SDKROOT = macosx; SWIFT_COMPILATION_MODE = wholemodule; SWIFT_OPTIMIZATION_LEVEL = "-O"; SWIFT_VERSION = 5.0; }; name = Release; };
+		A000000000000000000000022 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 18;
+				DEVELOPMENT_TEAM = BQPBKSBDZY;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = app/App-Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks", );
+				MARKETING_VERSION = 1.8;
+				PRODUCT_BUNDLE_IDENTIFIER = "local.greyscale-schedule";
+				PRODUCT_NAME = "Greyscale Schedule";
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Debug;
+		};
+		A000000000000000000000023 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 18;
+				DEVELOPMENT_TEAM = BQPBKSBDZY;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = app/App-Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks", );
+				MARKETING_VERSION = 1.8;
+				PRODUCT_BUNDLE_IDENTIFIER = "local.greyscale-schedule";
+				PRODUCT_NAME = "Greyscale Schedule";
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+		A000000000000000000000024 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				ARCHS = arm64;
+				CODE_SIGN_ENTITLEMENTS = extension.entitlements;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 18;
+				DEVELOPMENT_TEAM = BQPBKSBDZY;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = app/ControlExtension-Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks", "@executable_path/../../../../Frameworks", );
+				MARKETING_VERSION = 1.8;
+				PRODUCT_BUNDLE_IDENTIFIER = "local.greyscale-schedule.control2";
+				PRODUCT_NAME = GreyscaleControl;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Debug;
+		};
+		A000000000000000000000025 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				ARCHS = arm64;
+				CODE_SIGN_ENTITLEMENTS = extension.entitlements;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 18;
+				DEVELOPMENT_TEAM = BQPBKSBDZY;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = app/ControlExtension-Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks", "@executable_path/../../../../Frameworks", );
+				MARKETING_VERSION = 1.8;
+				PRODUCT_BUNDLE_IDENTIFIER = "local.greyscale-schedule.control2";
+				PRODUCT_NAME = GreyscaleControl;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A000000000000000000000010 /* Build configuration list for PBXNativeTarget "Greyscale Schedule" */ = {isa = XCConfigurationList; buildConfigurations = (A000000000000000000000022 /* Debug */, A000000000000000000000023 /* Release */, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		A000000000000000000000011 /* Build configuration list for PBXNativeTarget "GreyscaleControl" */ = {isa = XCConfigurationList; buildConfigurations = (A000000000000000000000024 /* Debug */, A000000000000000000000025 /* Release */, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		A000000000000000000000012 /* Build configuration list for PBXProject "GreyscaleSchedule" */ = {isa = XCConfigurationList; buildConfigurations = (A000000000000000000000020 /* Debug */, A000000000000000000000021 /* Release */, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+	};
+	rootObject = A00000000000000000000001 /* Project object */;
+}

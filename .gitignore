@@ -1,0 +1,25 @@
+# Generated builds, installers, and local tool state.
+.DS_Store
+.build/
+.swiftpm/
+/outputs/
+**/xcuserdata/
+*.xcuserstate
+
+# work also holds machine-specific preferences, old apps, and diagnostics.
+# Keep only the inputs needed to rebuild the current app.
+/work/*
+!/work/app/
+!/work/GreyscaleSchedule.xcodeproj/
+!/work/icon.iconset/
+!/work/extension.entitlements
+
+# Signing credentials must remain local.
+*.key
+*.pem
+*.p12
+*.pfx
+*.keychain
+*.keychain-db
+*.mobileprovision
+*.provisionprofile
