@@ -50,6 +50,8 @@ required source and assets. Signing still uses a local Apple Development identit
   and unknown fields are preserved. Saving a schedule never installs a tile.
   Legacy tiles are migrated in place or removed when a current tile already exists.
   The obsolete extension is disabled to prevent backup builds appearing in the gallery.
+  Command-line installation opens the app once through Launch Services before
+  enabling the tile. Later refreshes and tile actions do not open settings.
 - `AppDelegate.swift` contains the settings UI and legacy URL-command handling.
   Failed state reads appear as unavailable, not off. Installation work runs away
   from the UI thread, and uninstall errors are surfaced rather than ignored.
@@ -76,7 +78,7 @@ entry point and headless dynamic intent metadata. Override the defaults with
 ./scripts/package.sh
 ```
 
-The installable DMG is written to `outputs/Greyscale Schedule 1.9.dmg`.
+The installable DMG is written to `outputs/Greyscale Schedule 1.9.1.dmg`.
 
 ## Tests
 
@@ -127,7 +129,11 @@ The helper uses a
 
 `--status` reads through the helper. `--read-system-state` is a read-only diagnostic
 that bypasses it. `--install-control` installs or repairs the helper and native tile
-without replacing an existing tile. `--install-schedule` saves the current local
+without replacing an existing tile. Its first run opens settings before publishing
+the tile because macOS rejects App Intent actions from an app that has never been
+opened normally. Opening settings manually also completes this one-time step.
+If the launch fails, installation stops and reports the error. Later refreshes and
+all tile actions remain windowless. `--install-schedule` saves the current local
 settings independently of Control Centre.
 
 For an explicitly requested identifier migration, `--migrate-control-identity`

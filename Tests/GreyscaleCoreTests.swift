@@ -339,6 +339,68 @@ final class ScheduleTests: XCTestCase {
     }
 }
 
+final class FirstLaunchInstallationTests: XCTestCase {
+    private func withDefaults(_ test: (UserDefaults) async throws -> Void) async rethrows {
+        let suite = "local.greyscale.setup-tests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        try await test(defaults)
+    }
+    func testFirstInstallAwaitsAppOpeningAndRefreshDoesNotOpenAgain() async throws {
+        try await withDefaults { defaults in
+            var events: [String] = []
+            let open = {
+                events.append("opening")
+                await Task.yield()
+                events.append("opened")
+            }
+            let install = { events.append("installed") }
+            try await ControlInstallationPreparation.perform(defaults: defaults,
+                openApplication: open, installControl: install)
+            try await ControlInstallationPreparation.perform(defaults: defaults,
+                openApplication: open, installControl: install)
+            XCTAssertEqual(events, ["opening", "opened", "installed", "installed"])
+        }
+    }
+    func testExplicitAppOpeningSkipsInstallationLaunch() async throws {
+        try await withDefaults { defaults in
+            ControlInstallationPreparation.markAppOpened(in: defaults)
+            var installed = false
+            try await ControlInstallationPreparation.perform(defaults: defaults,
+                openApplication: { XCTFail("Already opened app launched again") },
+                installControl: { installed = true })
+            XCTAssertTrue(installed)
+        }
+    }
+    func testFailedFirstLaunchDoesNotInstallAndCanBeRetried() async throws {
+        try await withDefaults { defaults in
+            do {
+                try await ControlInstallationPreparation.perform(defaults: defaults,
+                    openApplication: { throw FakeFailure.write },
+                    installControl: { XCTFail("Tile installed before app launch succeeded") })
+                XCTFail("Launch failure was ignored")
+            } catch { XCTAssertTrue(error is FakeFailure) }
+            var opened = false
+            try await ControlInstallationPreparation.perform(defaults: defaults,
+                openApplication: { opened = true }, installControl: {})
+            XCTAssertTrue(opened)
+        }
+    }
+    func testFailedInstallationKeepsSuccessfulLaunchAndDoesNotReopenOnRetry() async throws {
+        try await withDefaults { defaults in
+            var opens = 0
+            do {
+                try await ControlInstallationPreparation.perform(defaults: defaults,
+                    openApplication: { opens += 1 }, installControl: { throw FakeFailure.write })
+                XCTFail("Installation failure was ignored")
+            } catch { XCTAssertTrue(error is FakeFailure) }
+            try await ControlInstallationPreparation.perform(defaults: defaults,
+                openApplication: { opens += 1 }, installControl: {})
+            XCTAssertEqual(opens, 1)
+        }
+    }
+}
+
 final class AgentInstallationTests: XCTestCase {
     private func temporaryAgent(_ test: (URL) throws -> Void) throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent("greyscale-agent-test-\(UUID().uuidString)")

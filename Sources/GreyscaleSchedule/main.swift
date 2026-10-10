@@ -11,8 +11,10 @@ private enum CommandLineInterface {
             case "--migrate-control-identity":
                 let values = Array(arguments.dropFirst())
                 guard values.count == 4 else { throw ControlCenterError.invalidIdentity }
-                try ControlCenterIntegration.migrateIdentity(containerIdentifier: values[0],
-                    extensionIdentifier: values[1], kind: values[2], previousDisplayName: values[3])
+                try await ControlInstallationPreparation.perform(openApplication: openApplicationForSetup) {
+                    try ControlCenterIntegration.migrateIdentity(containerIdentifier: values[0],
+                        extensionIdentifier: values[1], kind: values[2], previousDisplayName: values[3])
+                }
                 print("migrated")
             case "--install-helper":
                 try ControlRequestAgent.install()
@@ -27,7 +29,9 @@ private enum CommandLineInterface {
             case "--read-system-state":
                 print(try SystemDisplayFilter().read() ? "on" : "off")
             case "--install-control":
-                try ControlCenterIntegration.install()
+                try await ControlInstallationPreparation.perform(openApplication: openApplicationForSetup) {
+                    try ControlCenterIntegration.install()
+                }
                 print("installed")
             case "--install-schedule":
                 try await ScheduleService.install(settings: SettingsStore.load())
@@ -56,6 +60,19 @@ private enum CommandLineInterface {
             exit(1)
         }
         exit(0)
+    }
+
+    @MainActor
+    private static func openApplicationForSetup() async throws {
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.activates = true
+        configuration.addsToRecentItems = false
+        // The installing executable or helper may already be running. Setup
+        // needs a normal app launch, not a reopen event delivered to that CLI.
+        configuration.createsNewApplicationInstance = true
+        _ = try await NSWorkspace.shared.openApplication(
+            at: Bundle.main.bundleURL, configuration: configuration
+        )
     }
 }
 

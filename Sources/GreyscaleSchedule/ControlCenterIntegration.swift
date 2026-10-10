@@ -1,6 +1,26 @@
 import CoreFoundation
 import Foundation
 
+/// Launch Services must accept the containing app before App Intents can bind
+/// a newly installed control. Only explicit setup uses this path, never a click.
+enum ControlInstallationPreparation {
+    private static let openedKey = "controlSetup.appOpened"
+
+    static func markAppOpened(in defaults: UserDefaults = .standard) {
+        defaults.set(true, forKey: openedKey)
+    }
+
+    static func perform(defaults: UserDefaults = .standard,
+                        openApplication: () async throws -> Void,
+                        installControl: () throws -> Void) async throws {
+        if !defaults.bool(forKey: openedKey) {
+            try await openApplication()
+            markAppOpened(in: defaults)
+        }
+        try installControl()
+    }
+}
+
 enum ControlCenterError: LocalizedError {
     case invalidIdentity
     case invalidPreferences

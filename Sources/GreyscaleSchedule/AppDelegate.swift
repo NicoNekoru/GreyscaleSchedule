@@ -106,6 +106,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         window?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+        ControlInstallationPreparation.markAppOpened()
         refreshStatus()
     }
 
