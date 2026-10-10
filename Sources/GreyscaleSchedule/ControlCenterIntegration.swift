@@ -264,12 +264,40 @@ struct CustomControlRegistry {
                          "DisplayName": "Greyscale", "OverrideSizeForMenuBar": false, "Identifier": [identifier],
                          "ControlDescription": "Turn the greyscale display filter on or off.", "PromptsForUserConfiguration": false])
     }
+    mutating func migrateIdentity(containerIdentifier: String, extensionIdentifier: String,
+                                  kind: String, previousDisplayName: String) {
+        controls = controls.map { control in
+            guard ControlIdentity.matches(control["ControlIdentity"] as? String,
+                containerIdentifier: containerIdentifier, extensionIdentifier: extensionIdentifier, kind: kind)
+            else { return control }
+            var migrated = control
+            migrated["ControlIdentity"] = ControlIdentity.encoded
+            if control["DisplayName"] as? String == previousDisplayName {
+                migrated["DisplayName"] = "Greyscale"
+            }
+            if let description = control["ControlDescription"] as? String {
+                migrated["ControlDescription"] = description.replacingOccurrences(
+                    of: previousDisplayName.lowercased(), with: "greyscale")
+            }
+            return migrated
+        }
+    }
     func encoded() throws -> Data { try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys]) }
 }
 
 /// Decode and plan both blobs before touching either. Roll back the exact
 /// original bytes (including unknown fields) if either preference write fails.
 enum ControlCenterTransaction {
+    static func migrateIdentity(store: ControlCenterPreferenceStore, containerIdentifier: String,
+                                extensionIdentifier: String, kind: String, previousDisplayName: String) throws {
+        guard ![containerIdentifier, extensionIdentifier, kind, previousDisplayName].contains(where: { $0.isEmpty }) else {
+            throw ControlCenterError.invalidIdentity
+        }
+        try update(store: store) { registry, _ in
+            registry.migrateIdentity(containerIdentifier: containerIdentifier,
+                extensionIdentifier: extensionIdentifier, kind: kind, previousDisplayName: previousDisplayName)
+        }
+    }
     static func update(store: ControlCenterPreferenceStore,
                        plan: (inout CustomControlRegistry, inout BentoLayout) throws -> Void) throws {
         let oldControls = try store.readControls(); let oldLayout = try store.readLayout()
@@ -316,6 +344,18 @@ enum ControlCenterIntegration {
     private static let preferences = SystemControlCenterPreferences()
     private static let launchServices = "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
     private static var extensionURL: URL? { Bundle.main.builtInPlugInsURL?.appendingPathComponent("GreyscaleControl.appex") }
+
+    static func migrateIdentity(containerIdentifier: String, extensionIdentifier: String,
+                                kind: String, previousDisplayName: String) throws {
+        guard ControlIdentity.isValid else { throw ControlCenterError.invalidIdentity }
+        _ = try CustomControlRegistry(data: preferences.readControls())
+        _ = try BentoLayout(data: preferences.readLayout())
+        // Register the replacement provider before publishing identities that
+        // refer to it. Control Centre must not observe a missing provider.
+        try registerExtension()
+        try ControlCenterTransaction.migrateIdentity(store: preferences, containerIdentifier: containerIdentifier,
+            extensionIdentifier: extensionIdentifier, kind: kind, previousDisplayName: previousDisplayName)
+    }
 
     static func install() throws {
         guard ControlIdentity.isValid else { throw ControlCenterError.invalidIdentity }

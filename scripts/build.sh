@@ -3,8 +3,8 @@ set -euo pipefail
 
 SCRIPT_DIRECTORY="${0:A:h}"
 PROJECT_ROOT="${SCRIPT_DIRECTORY:h}"
-PROJECT="$PROJECT_ROOT/work/GreyscaleSchedule.xcodeproj"
-DERIVED_DATA="$PROJECT_ROOT/work/DerivedData-release"
+PROJECT="$PROJECT_ROOT/GreyscaleSchedule.xcodeproj"
+DERIVED_DATA="$PROJECT_ROOT/.build/DerivedData-release"
 APP="$DERIVED_DATA/Build/Products/Release/Greyscale Schedule.app"
 EXTENSION="$APP/Contents/PlugIns/GreyscaleControl.appex"
 APP_INTENTS="$APP/Contents/Resources/Metadata.appintents/extract.actionsdata"
@@ -35,13 +35,13 @@ fi
 /bin/mkdir -p "$APP/Contents/Resources"
 /usr/bin/iconutil \
     -c icns \
-    "$PROJECT_ROOT/work/icon.iconset" \
+    "$PROJECT_ROOT/Resources/AppIcon.iconset" \
     -o "$APP/Contents/Resources/AppIcon.icns"
 
 /usr/bin/codesign \
     --force \
     --sign "$SIGN_IDENTITY" \
-    --entitlements "$PROJECT_ROOT/work/extension.entitlements" \
+    --entitlements "$PROJECT_ROOT/Configuration/GreyscaleControl.entitlements" \
     "$EXTENSION"
 /usr/bin/codesign --force --sign "$SIGN_IDENTITY" "$APP"
 /usr/bin/codesign --verify --deep --strict --verbose=2 "$APP"

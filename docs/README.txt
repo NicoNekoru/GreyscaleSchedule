@@ -1,4 +1,4 @@
-Greyscale Schedule 1.8 for macOS 26
+Greyscale Schedule 1.9 for macOS 26
 
 Install
 1. Drag Greyscale Schedule to Applications.

@@ -8,6 +8,12 @@ private enum CommandLineInterface {
 
         do {
             switch command {
+            case "--migrate-control-identity":
+                let values = Array(arguments.dropFirst())
+                guard values.count == 4 else { throw ControlCenterError.invalidIdentity }
+                try ControlCenterIntegration.migrateIdentity(containerIdentifier: values[0],
+                    extensionIdentifier: values[1], kind: values[2], previousDisplayName: values[3])
+                print("migrated")
             case "--install-helper":
                 try ControlRequestAgent.install()
             case "--apply-schedule":

@@ -3,6 +3,24 @@
 A local macOS 26 utility that enables the system greyscale display filter on a
 schedule and exposes a native Control Centre control.
 
+## Repository layout
+
+| Location | Contents |
+| --- | --- |
+| `Sources/GreyscaleSchedule/` | App, helper, and Control Centre Swift source |
+| `Configuration/` | App and extension plists and widget entitlements |
+| `Resources/AppIcon.iconset/` | Source icon assets |
+| `GreyscaleSchedule.xcodeproj/` | App and extension build targets |
+| `Tests/` | Core regression tests |
+| `scripts/` | Test, build, and packaging entry points |
+| `docs/README.txt` | Read Me included in the installer |
+| `.build/` | Generated Xcode products, test builds, and module caches, ignored by Git |
+| `outputs/` | Current installer output, ignored by Git |
+| `archive/` | Local historical builds, backups, and diagnostics, described in its README |
+
+The build does not use anything in `archive/`. A fresh checkout contains all
+required source and assets. Signing still uses a local Apple Development identity.
+
 ## Architecture
 
 - `DisplayState.swift` serializes display operations and verifies actual state
@@ -35,7 +53,7 @@ schedule and exposes a native Control Centre control.
 - `AppDelegate.swift` contains the settings UI and legacy URL-command handling.
   Failed state reads appear as unavailable, not off. Installation work runs away
   from the UI thread, and uninstall errors are surfaced rather than ignored.
-- `work/GreyscaleSchedule.xcodeproj` builds and embeds both executable targets.
+- `GreyscaleSchedule.xcodeproj` builds and embeds both executable targets.
 
 The extension must be built by Xcode because WidgetKit extensions require the
 `_NSExtensionMain` entry point. Do not compile it as a standalone Swift binary.
@@ -58,7 +76,7 @@ entry point and headless dynamic intent metadata. Override the defaults with
 ./scripts/package.sh
 ```
 
-The installable DMG is written to `outputs/Greyscale Schedule 1.8.dmg`.
+The installable DMG is written to `outputs/Greyscale Schedule 1.9.dmg`.
 
 ## Tests
 
@@ -90,6 +108,10 @@ into its layout. Those private boundaries remain isolated and can change with an
 OS update. The widget stays sandboxed with one named Mach-service lookup exception.
 No app group, global file access or network permission is required.
 
+Project names and internal identifiers use Grey spelling. The two private Apple
+function names in `DisplayFilter.swift` retain their exact SDK spelling because
+symbol lookup must match macOS. Archived signed builds remain unchanged.
+
 Background execution follows Apple's
 [App Intents runtime modes](https://developer.apple.com/documentation/appintents/appintent/supportedmodes).
 The helper uses a
@@ -107,3 +129,9 @@ The helper uses a
 that bypasses it. `--install-control` installs or repairs the helper and native tile
 without replacing an existing tile. `--install-schedule` saves the current local
 settings independently of Control Centre.
+
+For an explicitly requested identifier migration, `--migrate-control-identity`
+takes the previous app identifier, extension identifier, control kind, and display
+name. It changes only matching archived identities and their standard labels.
+Tile identifiers, placement, sizes, custom names, and unrelated controls remain
+unchanged. Settings and login-agent migration are separate installation steps.

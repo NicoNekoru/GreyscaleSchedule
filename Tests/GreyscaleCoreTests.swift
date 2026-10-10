@@ -408,6 +408,7 @@ private final class FakePreferences: ControlCenterPreferenceStore {
     var controls: Data?
     var layout: Data
     var failNextLayoutWrite = false
+    var failNextControlsWrite = false
     var writes = 0
     var controlsReadCount = 0
     var mutateOnSecondRead = false
@@ -418,7 +419,11 @@ private final class FakePreferences: ControlCenterPreferenceStore {
         return controls
     }
     func readLayout() throws -> Data { layout }
-    func writeControls(_ data: Data?) throws { writes += 1; controls = data }
+    func writeControls(_ data: Data?) throws {
+        writes += 1
+        if failNextControlsWrite { failNextControlsWrite = false; throw FakeFailure.write }
+        controls = data
+    }
     func writeLayout(_ data: Data) throws {
         writes += 1
         if failNextLayoutWrite { failNextLayoutWrite = false; throw FakeFailure.write }
@@ -451,6 +456,74 @@ private func fixtureRegistry(identifier: String? = nil, lookalike: Bool = false)
 }
 
 final class ControlInstallationTests: XCTestCase {
+    private let previousContainer = "local.previous-app"
+    private let previousExtension = "local.previous-app.control"
+    private let previousKind = "local.previous-app.control.filter"
+    private func previousIdentityRegistry(customName: Bool = false) throws -> Data {
+        var archive = try PropertyListSerialization.propertyList(
+            from: Data(base64Encoded: ControlIdentity.encoded)!, options: [], format: nil) as! [String: Any]
+        archive["$objects"] = (archive["$objects"] as! [Any]).map { object -> Any in
+            guard let string = object as? String else { return object }
+            return string.replacingOccurrences(of: AppConfiguration.controlKind, with: previousKind)
+                .replacingOccurrences(of: AppConfiguration.extensionBundleIdentifier, with: previousExtension)
+                .replacingOccurrences(of: AppConfiguration.bundleIdentifier, with: previousContainer)
+        }
+        let encoded = try PropertyListSerialization.data(fromPropertyList: archive, format: .binary, options: 0)
+            .base64EncodedString()
+        var root = try JSONSerialization.jsonObject(with: fixtureRegistry(identifier: "existing", lookalike: true)) as! [String: Any]
+        var controls = root["Controls"] as! [[String: Any]]
+        controls[0]["ControlIdentity"] = encoded
+        controls[0]["DisplayName"] = customName ? "My customized tile" : "Previous"
+        controls[0]["ControlDescription"] = "Turn the previous display filter on or off."
+        root["Controls"] = controls
+        return try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+    }
+    private func migratePrevious(_ store: FakePreferences, kind: String? = nil) throws {
+        try ControlCenterTransaction.migrateIdentity(store: store, containerIdentifier: previousContainer,
+            extensionIdentifier: previousExtension, kind: kind ?? previousKind, previousDisplayName: "Previous")
+    }
+    func testIdentifierMigrationPreservesTilePlacementSizeAndUnrelatedControls() throws {
+        let store = FakePreferences(controls: try previousIdentityRegistry(),
+            layout: try fixtureLayout(identifier: "existing", size: "rect2x1", secondPage: true))
+        let originalLayout = store.layout
+        let before = try JSONSerialization.jsonObject(with: store.controls!) as! [String: Any]
+        try migratePrevious(store)
+        XCTAssertEqual(store.layout, originalLayout)
+        XCTAssertEqual(try CustomControlRegistry(data: store.controls).managedIdentifiers, ["existing"])
+        let after = try JSONSerialization.jsonObject(with: store.controls!) as! [String: Any]
+        let controls = after["Controls"] as! [[String: Any]]
+        XCTAssertEqual(controls[0]["ControlSize"] as? Int, 2)
+        XCTAssertEqual(controls[0]["unknownControl"] as? String, "keep")
+        XCTAssertEqual(controls[0]["DisplayName"] as? String, "Greyscale")
+        XCTAssertEqual(controls[0]["ControlDescription"] as? String, "Turn the greyscale display filter on or off.")
+        XCTAssertEqual(try JSONSerialization.data(withJSONObject: controls[1], options: [.sortedKeys]),
+            try JSONSerialization.data(withJSONObject: (before["Controls"] as! [[String: Any]])[1], options: [.sortedKeys]))
+    }
+    func testIdentifierMigrationKeepsCustomNameAndIsIdempotent() throws {
+        let store = FakePreferences(controls: try previousIdentityRegistry(customName: true),
+            layout: try fixtureLayout(identifier: "existing"))
+        try migratePrevious(store)
+        let writes = store.writes
+        try migratePrevious(store)
+        XCTAssertEqual(store.writes, writes)
+        let root = try JSONSerialization.jsonObject(with: store.controls!) as! [String: Any]
+        XCTAssertEqual((root["Controls"] as! [[String: Any]])[0]["DisplayName"] as? String, "My customized tile")
+    }
+    func testIdentifierMigrationRequiresExactPreviousKind() throws {
+        let store = FakePreferences(controls: try previousIdentityRegistry(), layout: try fixtureLayout(identifier: "existing"))
+        let original = store.controls
+        try migratePrevious(store, kind: "local.previous-app.control.unrelated")
+        XCTAssertEqual(store.writes, 0)
+        XCTAssertEqual(store.controls, original)
+    }
+    func testIdentifierMigrationWriteFailureRestoresExactOriginalBytes() throws {
+        let store = FakePreferences(controls: try previousIdentityRegistry(), layout: try fixtureLayout(identifier: "existing"))
+        let original = store.controls; let layout = store.layout
+        store.failNextControlsWrite = true
+        XCTAssertThrowsError(try migratePrevious(store))
+        XCTAssertEqual(store.controls, original)
+        XCTAssertEqual(store.layout, layout)
+    }
     private func legacyRegistry(currentIdentifier: String? = nil) throws -> Data {
         let archiveData = Data(base64Encoded: ControlIdentity.encoded)!
         var archive = try PropertyListSerialization.propertyList(from: archiveData, options: [], format: nil) as! [String: Any]

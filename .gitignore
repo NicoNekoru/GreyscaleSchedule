@@ -6,13 +6,10 @@
 **/xcuserdata/
 *.xcuserstate
 
-# work also holds machine-specific preferences, old apps, and diagnostics.
-# Keep only the inputs needed to rebuild the current app.
-/work/*
-!/work/app/
-!/work/GreyscaleSchedule.xcodeproj/
-!/work/icon.iconset/
-!/work/extension.entitlements
+# Historical builds, backups, and machine-specific diagnostics stay local.
+/archive/*
+!/archive/README.md
+/work/
 
 # Signing credentials must remain local.
 *.key
