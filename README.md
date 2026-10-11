@@ -11,6 +11,12 @@ Requires Apple Silicon and macOS 26 or later.
 brew install --cask niconekoru/tap/greyscale-schedule
 ```
 
+If macOS blocks the first launch, remove the quarantine attribute from this app.
+
+```sh
+xattr -rd com.apple.quarantine /Applications/Greyscale\ Schedule.app
+```
+
 Open Greyscale Schedule once, click Save Schedule, then click Install / Refresh
 Control to add its tile. Later tile clicks stay windowless.
 
