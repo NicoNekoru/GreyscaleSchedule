@@ -36,6 +36,7 @@ enum ControlIntentExecutionState {
 
 @objc protocol GreyscaleControlServiceProtocol {
     func read(reply: @escaping (Bool, String?) -> Void)
+    func readForControl(reply: @escaping (Bool, String?) -> Void)
     func set(_ enabled: Bool, identifier: String, deadline: Double, reply: @escaping (Bool, String?) -> Void)
     func cancel(_ identifier: String)
 }
@@ -64,10 +65,11 @@ final class ControlClient {
         self.makeConnection = makeConnection
     }
     func read() async throws -> Bool { try await request(enabled: nil) }
+    func readForControl() async throws -> Bool { try await request(enabled: nil, forControl: true) }
     @discardableResult
     func set(_ enabled: Bool) async throws -> Bool { try await request(enabled: enabled) }
 
-    private func request(enabled: Bool?) async throws -> Bool {
+    private func request(enabled: Bool?, forControl: Bool = false) async throws -> Bool {
         let pending = PendingControlReply()
         let identifier = UUID().uuidString
         let deadline = ProcessInfo.processInfo.systemUptime + timeout
@@ -101,6 +103,7 @@ final class ControlClient {
                     else { pending.finish(.success(actual)) }
                 }
                 if let enabled { remote.set(enabled, identifier: identifier, deadline: deadline, reply: reply) }
+                else if forControl { remote.readForControl(reply: reply) }
                 else { remote.read(reply: reply) }
             }
         } onCancel: { pending.finish(.failure(CancellationError())) }

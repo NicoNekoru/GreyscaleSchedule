@@ -1,4 +1,4 @@
-Greyscale Schedule 1.9.1 for macOS 26
+Greyscale Schedule 1.9.2 for macOS 26
 
 Install
 1. Drag Greyscale Schedule to Applications.
@@ -10,6 +10,8 @@ Control Centre
 - The app and control are signed for this Mac with the configured Apple Development team.
 - Control Centre clicks run entirely in the background and never open settings.
 - The tile and app read the same confirmed system state from the background helper.
+- Scheduled updates retry while the tile is hidden, until its provider samples the new state.
+- Opening the app shows settings on the first launch, without needing a second click.
 - Save Schedule does not recreate or move your Control Centre tile.
 - Install / Refresh Control keeps an existing tile's size and placement.
 - Command-line installation opens the app once before enabling the tile. Later refreshes stay windowless.

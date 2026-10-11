@@ -88,7 +88,9 @@ final class DisplayStateController {
     private func publish(_ actual: Bool) {
         let previous = observed
         observed = actual
-        if let previous, previous != actual { changed(actual) }
+        // A restarted helper has no baseline, but the tile may still have an
+        // older cached value. Publish the first confirmed snapshot as well.
+        if previous != actual { changed(actual) }
     }
 }
 
@@ -115,7 +117,9 @@ final class ControlExecutionTracker {
     func isStillIdle(generation expected: UInt64) -> Bool {
         lock.withLock { active.isEmpty && generation == expected }
     }
-    func shouldPresentWindow(explicit: Bool, isActive: Bool) -> Bool {
-        explicit || (isActive && !hasStarted)
+    func shouldPresentWindow(explicit: Bool, defaultLaunch: Bool) -> Bool {
+        // An accessory app need not become active before its first window is
+        // shown. Activation follows window presentation, not the other way round.
+        explicit || (defaultLaunch && !hasStarted)
     }
 }

@@ -60,17 +60,26 @@ private func set(_ controller: DisplayStateController, _ value: Bool,
 }
 
 final class DisplayStateTests: XCTestCase {
+    func testRestartedHelperPublishesInitialTruthEvenForAnUnchangedSchedule() async throws {
+        for enabled in [false, true] {
+            let filter = FakeFilter(); filter.changeExternally(enabled)
+            let actual = try await set(controller(filter), enabled)
+            XCTAssertEqual(actual, enabled)
+            XCTAssertEqual(filter.writes, [])
+            XCTAssertEqual(filter.events.filter { $0.hasPrefix("reload") }, ["reload:\(enabled)"])
+        }
+    }
     func testReloadOnlyAfterActualConfirmation() async throws {
         let filter = FakeFilter(); filter.delayReads = 3
         let state = controller(filter)
         let actual = try await set(state, true)
         XCTAssertTrue(actual)
-        XCTAssertEqual(filter.events, ["read:false", "write:true", "read:false", "read:false",
+        XCTAssertEqual(filter.events, ["read:false", "reload:false", "write:true", "read:false", "read:false",
                                         "read:false", "read:true", "reload:true"])
         let same = try await set(state, true)
         XCTAssertTrue(same)
         XCTAssertEqual(filter.writes, [true])
-        XCTAssertEqual(filter.events.filter { $0.hasPrefix("reload") }, ["reload:true"])
+        XCTAssertEqual(filter.events.filter { $0.hasPrefix("reload") }, ["reload:false", "reload:true"])
     }
     func testFreshReadsTrackSystemSettingsChanges() async throws {
         let filter = FakeFilter(); let state = controller(filter)
@@ -80,7 +89,7 @@ final class DisplayStateTests: XCTestCase {
         _ = try await read(state)
         filter.changeExternally(false)
         _ = try await read(state)
-        XCTAssertEqual(filter.events.filter { $0.hasPrefix("reload") }, ["reload:true", "reload:false"])
+        XCTAssertEqual(filter.events.filter { $0.hasPrefix("reload") }, ["reload:false", "reload:true", "reload:false"])
     }
     func testFailedWriteDoesNotPublishRequestedValue() async throws {
         let filter = FakeFilter(); filter.refusesWrite = true
@@ -112,7 +121,7 @@ final class DisplayStateTests: XCTestCase {
         await fulfillment(of: [finished], timeout: 5)
         XCTAssertEqual(filter.writes, (0..<12).map { $0.isMultiple(of: 2) })
         let actual = try await read(state); XCTAssertFalse(actual)
-        XCTAssertEqual(filter.events.filter { $0.hasPrefix("reload") }.count, 12)
+        XCTAssertEqual(filter.events.filter { $0.hasPrefix("reload") }.count, 13)
     }
     func testCancelledQueuedCommandNeverWrites() async throws {
         let filter = FakeFilter(); let clock = FakeClock(); let state = controller(filter, clock: clock)
@@ -140,6 +149,148 @@ final class DisplayStateTests: XCTestCase {
         filter.writeGate = nil
         let next = try await set(state, false); XCTAssertFalse(next)
         XCTAssertEqual(filter.writes, [true, false])
+    }
+}
+
+private final class FakeControlReloads {
+    private let lock = NSLock()
+    private var countStorage = 0
+    private var retries: [() -> Void] = []
+    var count: Int { lock.withLock { countStorage } }
+    var queuedRetries: Int { lock.withLock { retries.count } }
+    func reload() { lock.withLock { countStorage += 1 } }
+    func schedule(_ retry: @escaping () -> Void) { lock.withLock { retries.append(retry) } }
+    func runNextRetry() {
+        let retry = lock.withLock { retries.isEmpty ? nil : retries.removeFirst() }
+        retry?()
+    }
+    func coordinator() -> ControlRefreshCoordinator {
+        ControlRefreshCoordinator(reload: reload, scheduleRetry: schedule)
+    }
+}
+
+final class ControlRefreshTests: XCTestCase {
+    func testHiddenControlReloadRetriesUntilProviderSamplesIt() {
+        let reloads = FakeControlReloads(); let refresh = reloads.coordinator()
+        refresh.request(true)
+        XCTAssertEqual(reloads.count, 1)
+        for _ in 0..<4 { reloads.runNextRetry() }
+        XCTAssertEqual(reloads.count, 5)
+        XCTAssertEqual(reloads.queuedRetries, 1)
+        XCTAssertTrue(refresh.sampled(true))
+        reloads.runNextRetry()
+        XCTAssertEqual(reloads.count, 5)
+        XCTAssertEqual(reloads.queuedRetries, 0)
+    }
+    func testOldSampleCannotAcknowledgeANewerState() {
+        let reloads = FakeControlReloads(); let refresh = reloads.coordinator()
+        refresh.request(true)
+        refresh.request(false)
+        XCTAssertFalse(refresh.sampled(true))
+        XCTAssertEqual(reloads.queuedRetries, 1)
+        reloads.runNextRetry()
+        XCTAssertEqual(reloads.count, 3)
+        XCTAssertTrue(refresh.sampled(false))
+        reloads.runNextRetry()
+        XCTAssertEqual(reloads.queuedRetries, 0)
+    }
+    func testChangesCoalesceIntoOneRetryChainAndCanRestartAfterIdle() {
+        let reloads = FakeControlReloads(); let refresh = reloads.coordinator()
+        refresh.request(true)
+        XCTAssertTrue(refresh.sampled(true))
+        // Another boundary arrives before the already queued retry runs.
+        refresh.request(false)
+        XCTAssertEqual(reloads.queuedRetries, 1)
+        reloads.runNextRetry()
+        XCTAssertEqual(reloads.count, 3)
+        XCTAssertTrue(refresh.sampled(false))
+        reloads.runNextRetry()
+        XCTAssertEqual(reloads.queuedRetries, 0)
+        refresh.request(true)
+        XCTAssertEqual(reloads.queuedRetries, 1)
+        XCTAssertEqual(reloads.count, 4)
+    }
+    func testNoRefreshWorkWithoutAConfirmedState() {
+        let reloads = FakeControlReloads(); let refresh = reloads.coordinator()
+        XCTAssertFalse(refresh.sampled(false))
+        reloads.runNextRetry()
+        XCTAssertEqual(reloads.count, 0)
+        XCTAssertEqual(reloads.queuedRetries, 0)
+    }
+    func testNoRetryLoopWhenControlIsNotInstalledOrHasBeenRemoved() {
+        let reloads = FakeControlReloads()
+        var installed = true
+        let refresh = ControlRefreshCoordinator(reload: reloads.reload,
+            shouldRetry: { installed }, scheduleRetry: reloads.schedule)
+        refresh.request(true)
+        reloads.runNextRetry()
+        XCTAssertEqual(reloads.count, 2)
+        installed = false
+        reloads.runNextRetry()
+        XCTAssertEqual(reloads.count, 2)
+        XCTAssertEqual(reloads.queuedRetries, 0)
+        XCTAssertFalse(refresh.sampled(true))
+    }
+    func testAppReadsCannotAcknowledgeTileReloadButProviderReadsCan() async throws {
+        let filter = FakeFilter(); let reloads = FakeControlReloads()
+        let refresh = reloads.coordinator()
+        let state = DisplayStateController(backend: filter, changed: refresh.request)
+        let listener = NSXPCListener.anonymous()
+        let host = ControlServiceHost(controller: state, listener: listener,
+                                      requireSignedPeer: false, refresh: refresh)
+        try host.start()
+        defer { listener.invalidate() }
+        let client = ControlClient(timeout: 3) { NSXPCConnection(listenerEndpoint: listener.endpoint) }
+        let actual = try await client.set(true); XCTAssertTrue(actual)
+        let appState = try await client.read(); XCTAssertTrue(appState)
+        reloads.runNextRetry()
+        XCTAssertEqual(reloads.count, 3) // Initial truth, write confirmation, retry.
+        let tileState = try await client.readForControl(); XCTAssertTrue(tileState)
+        reloads.runNextRetry()
+        XCTAssertEqual(reloads.count, 3)
+        XCTAssertEqual(reloads.queuedRetries, 0)
+        withExtendedLifetime(host) {}
+    }
+    func testFailedProviderReadKeepsRefreshPending() async throws {
+        let filter = FakeFilter(); let reloads = FakeControlReloads()
+        let refresh = reloads.coordinator()
+        let state = DisplayStateController(backend: filter, changed: refresh.request)
+        let session = ControlServiceSession(controller: state, refresh: refresh)
+        _ = try await read(state)
+        filter.failsRead = true
+        let done = expectation(description: "failed provider read")
+        session.readForControl { _, error in XCTAssertNotNil(error); done.fulfill() }
+        await fulfillment(of: [done], timeout: 1)
+        reloads.runNextRetry()
+        XCTAssertEqual(reloads.count, 2)
+        XCTAssertEqual(reloads.queuedRetries, 1)
+    }
+    func testBothScheduleBoundariesRefreshWithoutAnAppWindow() async throws {
+        let filter = FakeFilter(); let reloads = FakeControlReloads()
+        let refresh = reloads.coordinator()
+        let state = DisplayStateController(backend: filter, changed: refresh.request)
+        let listener = NSXPCListener.anonymous()
+        let host = ControlServiceHost(controller: state, listener: listener,
+                                      requireSignedPeer: false, refresh: refresh)
+        try host.start()
+        defer { listener.invalidate() }
+        let client = ControlClient(timeout: 3) { NSXPCConnection(listenerEndpoint: listener.endpoint) }
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        for (date, expected) in [("2026-10-10T22:00:00Z", true), ("2026-10-11T05:00:00Z", false)] {
+            try await ScheduleService.apply(.standard, on: ISO8601DateFormatter().date(from: date)!, calendar: calendar) {
+                _ = try await client.set($0)
+            }
+            let countBeforeRetry = reloads.count
+            reloads.runNextRetry()
+            XCTAssertEqual(reloads.count, countBeforeRetry + 1)
+            let actual = try await client.readForControl(); XCTAssertEqual(actual, expected)
+            reloads.runNextRetry()
+            XCTAssertEqual(reloads.count, countBeforeRetry + 1)
+            XCTAssertEqual(reloads.queuedRetries, 0)
+        }
+        XCTAssertEqual(filter.writes, [true, false])
+        withExtendedLifetime(host) {}
     }
 }
 
@@ -256,6 +407,7 @@ private final class StalledService: NSObject, GreyscaleControlServiceProtocol, N
     var received: (() -> Void)?
     private var replies: [(Bool, String?) -> Void] = []
     func read(reply: @escaping (Bool, String?) -> Void) { replies.append(reply); received?() }
+    func readForControl(reply: @escaping (Bool, String?) -> Void) { replies.append(reply); received?() }
     func set(_ enabled: Bool, identifier: String, deadline: Double, reply: @escaping (Bool, String?) -> Void) { replies.append(reply); received?() }
     func cancel(_ identifier: String) {}
     func listener(_ listener: NSXPCListener, shouldAcceptNewConnection connection: NSXPCConnection) -> Bool {
@@ -284,12 +436,21 @@ final class HeadlessLifecycleTests: XCTestCase {
     }
     func testControlNeverPresentsWindowButExplicitOpenStillWorks() {
         let tracker = ControlExecutionTracker()
-        XCTAssertTrue(tracker.shouldPresentWindow(explicit: false, isActive: true))
+        XCTAssertTrue(tracker.shouldPresentWindow(explicit: false, defaultLaunch: true))
         let ticket = tracker.begin()
-        XCTAssertFalse(tracker.shouldPresentWindow(explicit: false, isActive: true))
+        XCTAssertFalse(tracker.shouldPresentWindow(explicit: false, defaultLaunch: true))
         _ = tracker.finish(ticket)
-        XCTAssertFalse(tracker.shouldPresentWindow(explicit: false, isActive: true))
-        XCTAssertTrue(tracker.shouldPresentWindow(explicit: true, isActive: false))
+        XCTAssertFalse(tracker.shouldPresentWindow(explicit: false, defaultLaunch: true))
+        XCTAssertTrue(tracker.shouldPresentWindow(explicit: true, defaultLaunch: false))
+    }
+    func testFirstNormalOpenDoesNotDependOnAppActivation() {
+        let tracker = ControlExecutionTracker()
+        XCTAssertTrue(tracker.shouldPresentWindow(explicit: false, defaultLaunch: true))
+    }
+    func testNonDefaultLaunchDoesNotPresentSettingsBeforeIntentBegins() {
+        let tracker = ControlExecutionTracker()
+        XCTAssertFalse(tracker.shouldPresentWindow(explicit: false, defaultLaunch: false))
+        XCTAssertTrue(tracker.shouldPresentWindow(explicit: true, defaultLaunch: false))
     }
 }
 

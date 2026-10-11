@@ -6,7 +6,7 @@ struct GreyscaleValueProvider: ControlValueProvider {
     var previewValue: Bool { false }
 
     func currentValue() async throws -> Bool {
-        let actual = try await ControlClient.shared.read()
+        let actual = try await ControlClient.shared.readForControl()
         ControlDiagnostics.event("Tile sampled confirmed greyscale \(actual ? "on" : "off")")
         return actual
     }

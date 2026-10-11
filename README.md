@@ -55,6 +55,10 @@ required source and assets. Signing still uses a local Apple Development identit
 - `ControlService.swift` runs an on-demand per-user XPC helper. It accepts only
   the app or widget signed by the same development team. It also observes changes
   made outside the app and refreshes the control when actual state changes.
+  macOS can discard a refresh while the tile is hidden. One coalesced retry runs
+  every two seconds until the tile's value provider samples the confirmed state.
+  App/status reads cannot acknowledge that refresh. Retries stop after sampling
+  or removal of the tile, and helper restarts publish their first confirmed state.
 - `ControlRequest.swift` contains the shared XPC interface, cancellable client,
   exactly-once reply handling, and headless execution tracker. There is no file
   queue or response polling. Existing legacy queue files are not replayed.
@@ -79,6 +83,8 @@ required source and assets. Signing still uses a local Apple Development identit
 - `AppDelegate.swift` contains the settings UI and legacy URL-command handling.
   Failed state reads appear as unavailable, not off. Installation work runs away
   from the UI thread, and uninstall errors are surfaced rather than ignored.
+  Normal launches show settings without waiting for activation. Intent launches
+  stay headless, and an explicit reopen can show settings after a tile action.
 - `GreyscaleSchedule.xcodeproj` builds and embeds both executable targets.
 
 The extension must be built by Xcode because WidgetKit extensions require the
@@ -95,6 +101,8 @@ identity, builds the app and extension, adds the icon, signs both bundles, and
 runs the regression suite and internal invariants. It also checks the extension
 entry point and headless dynamic intent metadata. Override the defaults with
 `DEVELOPER_DIR` or `GREYSCALE_SIGN_IDENTITY` when needed.
+After removing the build product's temporary registration, the script restores
+the installed app's registration. This keeps its tile's action binding intact.
 
 ## Package
 
@@ -102,7 +110,7 @@ entry point and headless dynamic intent metadata. Override the defaults with
 ./scripts/package.sh
 ```
 
-The installable DMG is written to `outputs/GreyscaleSchedule-v1.9.1-macos-arm64.dmg`.
+The installable DMG is written to `outputs/GreyscaleSchedule-v1.9.2-macos-arm64.dmg`.
 
 ## Publish a release
 
@@ -139,7 +147,8 @@ brew install --cask --dry-run niconekoru/tap/greyscale-schedule
 
 The XCTest suite compiles the production core with fake display and preference
 backends. It covers confirmation/reload ordering, external changes, overlapping
-commands, failures, cancellation and deadlines, XPC round trips, headless lifetime,
+commands, failures, cancellation and deadlines, XPC round trips, hidden-tile refresh
+retries and acknowledgements, helper restarts, first-open behaviour, headless lifetime,
 schedule boundaries and disabled automation, settings migration, stable tile
 placement, legacy migration, malformed layouts, ownership, idempotence and rollback. It does not
 change the real display filter, Control Centre layout or installed agents.
@@ -148,6 +157,10 @@ For native integration verification, click the installed tile on and off and
 check the `Control intent requested` and `Tile sampled confirmed` log events.
 This check is separate from the fake-backend suite and catches OS action-binding
 or extension-discovery failures that a direct helper test cannot detect.
+Also check a scheduled change with settings closed and Control Centre hidden.
+On revealing the tile, it should refresh without a click. Reload requests repeat
+every two seconds, though macOS can throttle when it processes them.
+The helper logs `refresh acknowledged` when the provider reads that state.
 
 Cancellation or expiry prevents a command that has not committed from writing.
 Once macOS has accepted a write, the helper completes verification even if the

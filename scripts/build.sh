@@ -69,4 +69,15 @@ done
 /usr/bin/pluginkit -r "$EXTENSION" >/dev/null 2>&1 || true
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
     -u "$APP" >/dev/null 2>&1 || true
+# App Intents indexes by bundle identifier, not just registration path. Removing
+# a build product can also remove the installed app's action bindings. Restore
+# the canonical installed copy, without registering a second gallery provider.
+for installed_app in "/Applications/Greyscale Schedule.app" "$HOME/Applications/Greyscale Schedule.app"; do
+    if [[ -d "$installed_app" ]]; then
+        /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
+            -f "$installed_app"
+        /usr/bin/pluginkit -a "$installed_app/Contents/PlugIns/GreyscaleControl.appex"
+        break
+    fi
+done
 print -r -- "$APP"

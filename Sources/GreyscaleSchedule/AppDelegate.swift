@@ -39,6 +39,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var busy = false
     private var buttons: [NSButton] = []
     private var statusGeneration: UInt64 = 0
+    private var defaultLaunch = false
     private let enabledCheck = NSButton(
         checkboxWithTitle: "Enable automatic greyscale", target: nil, action: nil
     )
@@ -47,6 +48,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let statusLabel = NSTextField(labelWithString: "")
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        defaultLaunch = (notification.userInfo?[NSApplication.launchIsDefaultUserInfoKey] as? Bool) == true
+        ControlDiagnostics.record("App launch default=\(defaultLaunch) active=\(NSApp.isActive) control=\(ControlIntentExecutionState.tracker.hasStarted)")
         controlIntentObserver = NotificationCenter.default.addObserver(
             forName: ControlIntentExecutionState.didFinishNotification,
             object: nil,
@@ -67,6 +70,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         _ sender: NSApplication,
         hasVisibleWindows flag: Bool
     ) -> Bool {
+        ControlDiagnostics.record("Explicit app reopen")
         presentSettingsWindow(userInitiated: true)
         return true
     }
@@ -95,8 +99,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func presentSettingsWindow(userInitiated: Bool) {
+        guard userInitiated || window?.isVisible != true else { return }
         guard ControlIntentExecutionState.tracker.shouldPresentWindow(
-            explicit: userInitiated, isActive: NSApp.isActive
+            explicit: userInitiated, defaultLaunch: defaultLaunch
         ) else { return }
 
         NSApp.setActivationPolicy(.regular)
@@ -106,6 +111,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         window?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+        ControlDiagnostics.record("Settings window presented explicit=\(userInitiated)")
         ControlInstallationPreparation.markAppOpened()
         refreshStatus()
     }
