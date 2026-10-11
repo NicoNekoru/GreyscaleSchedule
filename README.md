@@ -3,6 +3,24 @@
 A local macOS 26 utility that enables the system greyscale display filter on a
 schedule and exposes a native Control Centre control.
 
+## Install with Homebrew
+
+Requires Apple Silicon and macOS 26 or later.
+
+```sh
+brew install --cask niconekoru/tap/greyscale-schedule
+```
+
+Open Greyscale Schedule once, click Save Schedule, then click Install / Refresh
+Control to add its tile. Later tile clicks stay windowless.
+
+The default schedule turns greyscale on at 10 PM and off at 5 AM in the Mac's
+local time zone. Settings remain local to the Mac.
+
+Use the app's Uninstall button to remove its schedule and Control Centre tile.
+Then remove the Homebrew installation record and remaining local settings with
+`brew uninstall --cask --zap greyscale-schedule`.
+
 ## Repository layout
 
 | Location | Contents |
@@ -78,7 +96,34 @@ entry point and headless dynamic intent metadata. Override the defaults with
 ./scripts/package.sh
 ```
 
-The installable DMG is written to `outputs/Greyscale Schedule 1.9.1.dmg`.
+The installable DMG is written to `outputs/GreyscaleSchedule-v1.9.1-macos-arm64.dmg`.
+
+## Publish a release
+
+Keep the existing release tag and asset immutable. For a new version, update the
+Xcode app and extension version together and update the installer Read Me. Commit
+and tag that source, then run `./scripts/package.sh` from the tagged checkout.
+The package script runs the tests, verifies both signatures, checks the headless
+intent metadata, and verifies the DMG.
+
+Upload `GreyscaleSchedule-vVERSION-macos-arm64.dmg` to the matching `vVERSION`
+GitHub release. Use `gh release create --verify-tag` after pushing the tag to
+avoid publishing from the wrong source revision.
+
+The `update greyscale cask` workflow in
+[NicoNekoru/homebrew-tap](https://github.com/NicoNekoru/homebrew-tap) accepts the
+release version. It downloads the published asset and calculates its SHA-256
+before updating the cask. It also accepts a `greyscale-schedule-release`
+repository dispatch with a `version` field.
+
+Verify each update without replacing the maintainer's installed app or altering
+the real display filter.
+
+```sh
+brew audit --cask --strict niconekoru/tap/greyscale-schedule
+brew fetch --cask niconekoru/tap/greyscale-schedule
+brew install --cask --dry-run niconekoru/tap/greyscale-schedule
+```
 
 ## Tests
 

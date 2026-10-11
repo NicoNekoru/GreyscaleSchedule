@@ -1,0 +1,32 @@
+## Greyscale Schedule 1.9.1
+
+Greyscale Schedule turns the Mac's greyscale display filter on overnight and adds
+a native Control Centre toggle. Requires Apple Silicon and macOS 26 or later.
+
+### Install
+
+```sh
+brew install --cask niconekoru/tap/greyscale-schedule
+```
+
+Or download the DMG below and drag Greyscale Schedule into Applications.
+
+Open the app once, click Save Schedule, then click Install / Refresh Control.
+The default schedule is 10 PM to 5 AM in the Mac's local time zone. Later tile
+clicks toggle the filter without opening settings.
+
+### Changes
+
+- App, helper, Control Centre identity and project names now use Grey spelling.
+- The tile reads the confirmed system state from one shared helper.
+- Installation opens the app once before enabling the tile. Subsequent refreshes
+  and tile actions stay windowless.
+- Existing settings and tile placement survive the identity migration.
+- 51 regression tests cover state handling, headless execution, installation,
+  schedules, identity migration and rollback.
+
+### Uninstall
+
+Use Uninstall in the app to remove its schedule and native control. Then run
+`brew uninstall --cask --zap greyscale-schedule` to remove the Homebrew record and
+remaining local settings.

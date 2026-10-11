@@ -14,7 +14,7 @@ trap cleanup EXIT
 
 "$SCRIPT_DIRECTORY/build.sh"
 VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Contents/Info.plist")"
-OUTPUT="$OUTPUT_DIRECTORY/Greyscale Schedule $VERSION.dmg"
+OUTPUT="$OUTPUT_DIRECTORY/GreyscaleSchedule-v$VERSION-macos-arm64.dmg"
 /bin/mkdir -p "$OUTPUT_DIRECTORY"
 /usr/bin/ditto "$APP" "$STAGING_DIRECTORY/Greyscale Schedule.app"
 /bin/cp "$PROJECT_ROOT/docs/README.txt" "$STAGING_DIRECTORY/Read Me.txt"
