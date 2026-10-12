@@ -20,6 +20,9 @@ private enum CommandLineInterface {
                 try ControlRequestAgent.install()
             case "--apply-schedule":
                 try await ScheduleService.applyCurrentSchedule()
+            case "--solar-status":
+                let solar = try SystemSolarSchedule.read()
+                print("System sun times available; greyscale \(solar.previous.enablesGreyscale ? "on" : "off"); next boundary \(solar.next.date)")
             case "--on", "--request-control-on":
                 try await ControlClient.shared.set(true)
             case "--off", "--request-control-off":
@@ -102,6 +105,9 @@ private enum SelfTest {
     }
 }
 
+if CommandLine.arguments.dropFirst().first == "--serve-solar-schedule" {
+    SolarScheduleRuntime.run()
+}
 if CommandLine.arguments.dropFirst().first == "--serve-control" {
     do { try ControlServiceHost.run() }
     catch { fputs("\(error.localizedDescription)\n", stderr); exit(1) }

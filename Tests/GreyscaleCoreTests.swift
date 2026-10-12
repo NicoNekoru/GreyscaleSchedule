@@ -490,7 +490,7 @@ final class ScheduleTests: XCTestCase {
         SettingsStore.save(saved, to: defaults)
         defaults.set(false, forKey: "scheduleEnabled"); defaults.set(1, forKey: "endHour")
         XCTAssertEqual(SettingsStore.load(from: defaults), saved)
-        XCTAssertNotNil(defaults.data(forKey: "schedule.v2"))
+        XCTAssertNotNil(defaults.data(forKey: "schedule.v3"))
     }
     func testHelperIsOnDemandXPCNotFileQueue() {
         let definition = ControlRequestAgent.definition(executable: "/fake/app", fingerprint: "test-build")

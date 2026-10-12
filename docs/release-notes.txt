@@ -1,4 +1,4 @@
-## Greyscale Schedule 1.9.1
+## Greyscale Schedule 1.10.0
 
 Greyscale Schedule turns the Mac's greyscale display filter on overnight and adds
 a native Control Centre toggle. Requires Apple Silicon and macOS 26 or later.
@@ -11,22 +11,37 @@ brew install --cask niconekoru/tap/greyscale-schedule
 
 Or download the DMG below and drag Greyscale Schedule into Applications.
 
-Open the app once, click Save Schedule, then click Install / Refresh Control.
-The default schedule is 10 PM to 5 AM in the Mac's local time zone. Later tile
-clicks toggle the filter without opening settings.
+Open the app once, choose a schedule and click Save Schedule. Click Add Control
+if the tile is missing. Refresh Control is under Setup and maintenance.
+The default schedule is 10 PM to 5 AM. Later tile clicks stay windowless.
+
+If macOS blocks the first launch, remove the quarantine attribute from this app.
+
+```sh
+xattr -rd com.apple.quarantine /Applications/Greyscale\ Schedule.app
+```
 
 ### Changes
 
-- App, helper, Control Centre identity and project names now use Grey spelling.
-- The tile reads the confirmed system state from one shared helper.
-- Installation opens the app once before enabling the tile. Subsequent refreshes
-  and tile actions stay windowless.
-- Existing settings and tile placement survive the identity migration.
-- 51 regression tests cover state handling, headless execution, installation,
-  schedules, identity migration and rollback.
+- Redesigned native settings with a Mac pop-up, a compact From/to row, an explicit
+  Save Schedule button and a small unsaved-change dot that does not move the layout.
+- Sunset to Sunrise uses macOS's current sun times without a separate location
+  prompt or requiring Night Shift to be enabled. It works with settings closed.
+- One Turn On or Turn Off button reflects the confirmed display state. Setup and
+  maintenance stays collapsed until needed, with errors and recovery shown inline.
+- Scheduled changes refresh the Control Centre tile while the app is closed.
+  Tile clicks still stay windowless.
+- Settings open on the first normal launch without flickering.
+- Update preparation retires stale control extensions, preventing the blank tile
+  caused by a previous build remaining alive after replacement.
+- Slow status reads cannot overwrite newer state or interrupt a time edit.
+- Existing schedules and tile placement are preserved. Manual changes last until
+  the next scheduled boundary, including across solar scheduler restarts.
+- 98 regression tests cover display state, scheduling, settings interactions,
+  layout, headless execution, update recovery, migration and rollback.
 
 ### Uninstall
 
-Use Uninstall in the app to remove its schedule and native control. Then run
+Use Uninstall under Setup and maintenance to remove its schedule and native control. Then run
 `brew uninstall --cask --zap greyscale-schedule` to remove the Homebrew record and
 remaining local settings.

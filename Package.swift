@@ -7,9 +7,9 @@ let package = Package(
     products: [.library(name: "GreyscaleCore", targets: ["GreyscaleCore"])],
     targets: [
         .target(name: "GreyscaleCore", path: "Sources/GreyscaleSchedule",
-                exclude: ["main.swift", "AppDelegate.swift", "ControlExtension.swift",
+                exclude: ["main.swift", "ControlExtension.swift",
                           "GreyscaleControlIntent.swift"],
-                sources: ["SharedConfiguration.swift", "DisplayState.swift", "DisplayFilter.swift",
+                sources: ["AppDelegate.swift", "SettingsWindow.swift", "SolarSchedule.swift", "SharedConfiguration.swift", "DisplayState.swift", "DisplayFilter.swift",
                           "ControlRequest.swift", "ControlService.swift", "ProcessRunner.swift",
                           "ControlRequestAgent.swift", "Schedule.swift", "ControlIdentity.swift",
                           "ControlCenterIntegration.swift"]),

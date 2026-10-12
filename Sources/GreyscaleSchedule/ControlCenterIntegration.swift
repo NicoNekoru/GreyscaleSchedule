@@ -400,14 +400,18 @@ enum ControlCenterIntegration {
         restartControlCenter()
     }
     static var isInstalled: Bool {
-        guard let registry = try? CustomControlRegistry(data: preferences.readControls()),
-              let layout = try? BentoLayout(data: preferences.readLayout()) else { return false }
+        (try? readInstallationState()) ?? false
+    }
+    static func readInstallationState() throws -> Bool {
+        let registry = try CustomControlRegistry(data: preferences.readControls())
+        let layout = try BentoLayout(data: preferences.readLayout())
         return registry.managedIdentifiers.contains { layout.contains($0) }
     }
     static func registerExtension() throws {
         guard let url = extensionURL else { throw CocoaError(.fileNoSuchFile) }
         try ProcessRunner.checked(launchServices, ["-f", Bundle.main.bundleURL.path])
         try ProcessRunner.checked("/usr/bin/pluginkit", ["-a", url.path])
+        try ControlRequestAgent.repairExtensionRuntime()
     }
     static func unregisterExtension() throws {
         guard let url = extensionURL else { throw CocoaError(.fileNoSuchFile) }

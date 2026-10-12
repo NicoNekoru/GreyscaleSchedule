@@ -77,6 +77,9 @@ for installed_app in "/Applications/Greyscale Schedule.app" "$HOME/Applications/
         /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
             -f "$installed_app"
         /usr/bin/pluginkit -a "$installed_app/Contents/PlugIns/GreyscaleControl.appex"
+        # Registration alone does not replace an already-running widget. The
+        # installed app checks for stale signed processes at its own path.
+        "$installed_app/Contents/MacOS/Greyscale Schedule" --install-helper
         break
     fi
 done

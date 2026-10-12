@@ -26,6 +26,8 @@
 		B00000000000000000000011 /* ControlRequestAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000012 /* ControlRequestAgent.swift */; };
 		B00000000000000000000012 /* DisplayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000013 /* DisplayState.swift */; };
 		B00000000000000000000013 /* ControlService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000014 /* ControlService.swift */; };
+		B00000000000000000000014 /* SolarSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000015 /* SolarSchedule.swift */; };
+		B00000000000000000000015 /* SettingsWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000016 /* SettingsWindow.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +75,8 @@
 		F00000000000000000000012 /* ControlRequestAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/GreyscaleSchedule/ControlRequestAgent.swift; sourceTree = "<group>"; };
 		F00000000000000000000013 /* DisplayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/GreyscaleSchedule/DisplayState.swift; sourceTree = "<group>"; };
 		F00000000000000000000014 /* ControlService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/GreyscaleSchedule/ControlService.swift; sourceTree = "<group>"; };
+		F00000000000000000000015 /* SolarSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/GreyscaleSchedule/SolarSchedule.swift; sourceTree = "<group>"; };
+		F00000000000000000000016 /* SettingsWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sources/GreyscaleSchedule/SettingsWindow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +102,8 @@
 				F00000000000000000000012 /* ControlRequestAgent.swift */,
 				F00000000000000000000013 /* DisplayState.swift */,
 				F00000000000000000000014 /* ControlService.swift */,
+				F00000000000000000000015 /* SolarSchedule.swift */,
+				F00000000000000000000016 /* SettingsWindow.swift */,
 				F0000000000000000000000C /* App-Info.plist */,
 				F0000000000000000000000D /* ControlExtension-Info.plist */,
 				F0000000000000000000000E /* GreyscaleControl.entitlements */,
@@ -204,6 +210,8 @@
 				B00000000000000000000011 /* ControlRequestAgent.swift in Sources */,
 				B00000000000000000000012 /* DisplayState.swift in Sources */,
 				B00000000000000000000013 /* ControlService.swift in Sources */,
+				B00000000000000000000014 /* SolarSchedule.swift in Sources */,
+				B00000000000000000000015 /* SettingsWindow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -237,12 +245,12 @@
 			buildSettings = {
 				ARCHS = arm64;
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = BQPBKSBDZY;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Configuration/App-Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks", );
-				MARKETING_VERSION = 1.9.2;
+				MARKETING_VERSION = 1.10.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "local.greyscale-schedule";
 				PRODUCT_NAME = "Greyscale Schedule";
 				SUPPORTED_PLATFORMS = macosx;
@@ -255,12 +263,12 @@
 			buildSettings = {
 				ARCHS = arm64;
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = BQPBKSBDZY;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Configuration/App-Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks", );
-				MARKETING_VERSION = 1.9.2;
+				MARKETING_VERSION = 1.10.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "local.greyscale-schedule";
 				PRODUCT_NAME = "Greyscale Schedule";
 				SUPPORTED_PLATFORMS = macosx;
@@ -275,12 +283,12 @@
 				ARCHS = arm64;
 				CODE_SIGN_ENTITLEMENTS = Configuration/GreyscaleControl.entitlements;
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = BQPBKSBDZY;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Configuration/ControlExtension-Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks", "@executable_path/../../../../Frameworks", );
-				MARKETING_VERSION = 1.9.2;
+				MARKETING_VERSION = 1.10.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "local.greyscale-schedule.control2";
 				PRODUCT_NAME = GreyscaleControl;
 				SKIP_INSTALL = YES;
@@ -296,12 +304,12 @@
 				ARCHS = arm64;
 				CODE_SIGN_ENTITLEMENTS = Configuration/GreyscaleControl.entitlements;
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = BQPBKSBDZY;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Configuration/ControlExtension-Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks", "@executable_path/../../../../Frameworks", );
-				MARKETING_VERSION = 1.9.2;
+				MARKETING_VERSION = 1.10.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "local.greyscale-schedule.control2";
 				PRODUCT_NAME = GreyscaleControl;
 				SKIP_INSTALL = YES;
